@@ -16,8 +16,6 @@
         "Topic :: Software Development :: Libraries :: Python Modules",
     ]
     dependencies = [
-        "aiofile>=3.9.0",
-        "aiofiles>=24.1.0",
         "bpython>=0.25",
         "logging-tree>=1.10",
         "loguru>=0.7.3",
@@ -25,7 +23,6 @@
         "pydantic-settings>=2.9.1",
         "pydantic[email]>=2.11.5",
         "pysnooper>=1.2.3",
-        "python-dotenv>=1.1.0",
         "rich>=14.0.0",
         "typer>=0.16.0",
     ]

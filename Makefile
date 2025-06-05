@@ -15,6 +15,11 @@ check: ## Run code quality tools.
 	@echo "🚀 Checking for obsolete dependencies: Running deptry"
 	@uv run deptry src
 
+.PHONY: lint
+lint: ## lint the code.
+	@echo "🚀 Linting code: Running pre-commit"
+	@uv run pre-commit run -a
+
 .PHONY: test
 test: ## Test the code with pytest
 	@echo "🚀 Testing code: Running pytest"

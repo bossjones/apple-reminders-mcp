@@ -154,6 +154,66 @@ def go() -> None:
     cprint("[yellow]Server startup not yet implemented[/yellow]")
 
 
+@APP.command("serve-mcp")
+async def serve_mcp(
+    host: Annotated[str, typer.Option("--host", "-h", help="Host to bind the server")] = "localhost",
+    port: Annotated[int, typer.Option("--port", "-p", help="Port to bind the server")] = 8000,
+) -> None:
+    """Start the Apple Reminders MCP server."""
+    cprint("[bold blue]🚀 Starting Apple Reminders MCP Server[/bold blue]")
+    cprint(f"[blue]Host: {host}[/blue]")
+    cprint(f"[blue]Port: {port}[/blue]")
+
+    try:
+        # Import the server module and start it
+        import os
+
+        # Set environment variables for the server configuration
+        os.environ["HOST"] = host
+        os.environ["PORT"] = str(port)
+
+        # Import server after setting environment variables
+        from apple_reminders_mcp.server import mcp
+
+        cprint("[green]✅ Server configuration loaded[/green]")
+        cprint("[yellow]Press Ctrl+C to stop the server[/yellow]")
+
+        # Start the FastMCP server
+        # Check available methods dynamically to avoid static type checking issues
+        startup_methods = ["run", "serve", "start"]
+        method_found = False
+
+        for method_name in startup_methods:
+            if hasattr(mcp, method_name):
+                method = getattr(mcp, method_name)
+                cprint(f"[green]Found startup method: {method_name}[/green]")
+
+                if asyncio.iscoroutinefunction(method):
+                    await method()
+                else:
+                    method()
+                method_found = True
+                break
+
+        if not method_found:
+            cprint("[yellow]⚠️  No standard startup method found.[/yellow]")
+            cprint("[blue]Available methods on mcp object:[/blue]")
+            methods = [method for method in dir(mcp) if not method.startswith("_") and callable(getattr(mcp, method))]
+            for method in methods[:10]:  # Show first 10 methods
+                cprint(f"  - {method}")
+            if len(methods) > 10:
+                cprint(f"  ... and {len(methods) - 10} more methods")
+
+            cprint("[yellow]Please check FastMCP documentation for the correct startup method.[/yellow]")
+
+    except KeyboardInterrupt:
+        cprint("[yellow]⏹️  Server stopped by user[/yellow]")
+    except Exception as e:
+        cprint(f"[red]❌ Error starting server: {e}[/red]")
+        LOGGER.error(f"Server startup error: {e}")
+        raise typer.Exit(1)
+
+
 def handle_sigterm(signo: int, frame: FrameType | None) -> NoReturn:
     """Handle SIGTERM signal by exiting with the appropriate status code.
 

@@ -28,23 +28,15 @@ class Environment(str, Enum):
 
 
 class McpSettings(BaseSettings):
-    """Settings for the Boss-Bot application.
+    """Settings for the Apple Reminders MCP application.
 
     Attributes:
-        discord_token: Discord bot token
-        discord_client_id: Discord client ID (optional)
-        discord_server_id: Discord server ID (optional)
-        discord_admin_user_id: Discord admin user ID (optional)
-        discord_admin_user_invited: Whether the admin user has been invited
+        storage_root: Root directory for file storage
+        host: Host for the MCP server
+        port: Port for the MCP server
         enable_ai: Whether AI features are enabled
         enable_redis: Whether Redis is enabled
         enable_sentry: Whether Sentry is enabled
-        sentry_dsn: Sentry DSN
-        openai_api_key: OpenAI API key
-        storage_root: Root directory for file storage
-        max_file_size_mb: Maximum file size in MB
-        max_concurrent_downloads: Maximum concurrent downloads
-        max_queue_size: Maximum queue size for downloads
         log_level: Logging level
         enable_metrics: Enable Prometheus metrics
         metrics_port: Port for Prometheus metrics
@@ -130,15 +122,17 @@ class McpSettings(BaseSettings):
     firecrawl_api_key: SecretStr | None = Field(
         None, description="Firecrawl API key", validation_alias="FIRECRAWL_API_KEY"
     )
-    langchain_api_key: SecretStr = Field(..., description="LangChain API key", validation_alias="LANGCHAIN_API_KEY")
+    langchain_api_key: SecretStr | None = Field(
+        None, description="LangChain API key", validation_alias="LANGCHAIN_API_KEY"
+    )
     langchain_debug_logs: bool = Field(
         False, description="Enable LangChain debug logs", validation_alias="LANGCHAIN_DEBUG_LOGS"
     )
     langchain_endpoint: AnyHttpUrl = Field(
         AnyHttpUrl("http://localhost:8000"), description="LangChain endpoint", validation_alias="LANGCHAIN_ENDPOINT"
     )
-    langchain_hub_api_key: SecretStr = Field(
-        ..., description="LangChain Hub API key", validation_alias="LANGCHAIN_HUB_API_KEY"
+    langchain_hub_api_key: SecretStr | None = Field(
+        None, description="LangChain Hub API key", validation_alias="LANGCHAIN_HUB_API_KEY"
     )
     langchain_hub_api_url: AnyHttpUrl = Field(
         AnyHttpUrl("http://localhost:8001"),
@@ -164,28 +158,6 @@ class McpSettings(BaseSettings):
         AnyHttpUrl("http://localhost:8002"), description="Unstructured API URL", validation_alias="UNSTRUCTURED_API_URL"
     )
 
-    @field_validator("discord_token")
-    def validate_discord_token(cls, v: SecretStr) -> SecretStr:
-        """Validate Discord token format."""
-        # token = v.get_secret_value()
-        # if not token.startswith("test_token") and not token.startswith("Bot "):
-        #     raise ValueError("Invalid Discord token format")
-        return v
-
-    @field_validator("openai_api_key")
-    def validate_openai_key(cls, v: SecretStr) -> SecretStr:
-        """Validate OpenAI API key format."""
-        # if not v.get_secret_value().startswith("sk-"):
-        #     raise ValueError("Invalid OpenAI API key format")
-        return v
-
-    @field_validator("sentry_dsn")
-    def validate_sentry_dsn(cls, v: str | None) -> str | None:
-        """Convert empty string to None for sentry_dsn."""
-        if not v:
-            return None
-        return v
-
     @field_validator("log_level")
     def validate_log_level(cls, v: str) -> str:
         """Validate logging level."""
@@ -202,9 +174,6 @@ class McpSettings(BaseSettings):
         return v
 
     @field_validator(
-        "max_file_size_mb",
-        "max_concurrent_downloads",
-        "max_queue_size",
         "metrics_port",
         "health_check_port",
         "rate_limit_requests",
@@ -222,20 +191,12 @@ class McpSettings(BaseSettings):
         """Return string representation with hidden secrets."""
         return (
             f"McpSettings("
-            f"discord_token=SecretStr('**********'), "
-            f"discord_client_id={self.discord_client_id}, "
-            f"discord_server_id={self.discord_server_id}, "
-            f"discord_admin_user_id={self.discord_admin_user_id}, "
-            f"discord_admin_user_invited={self.discord_admin_user_invited}, "
+            f"storage_root={self.storage_root}, "
+            f"host={self.host}, "
+            f"port={self.port}, "
             f"enable_ai={self.enable_ai}, "
             f"enable_redis={self.enable_redis}, "
             f"enable_sentry={self.enable_sentry}, "
-            f"sentry_dsn={self.sentry_dsn}, "
-            f"openai_api_key=SecretStr('**********'), "
-            f"storage_root={self.storage_root}, "
-            f"max_file_size_mb={self.max_file_size_mb}, "
-            f"max_concurrent_downloads={self.max_concurrent_downloads}, "
-            f"max_queue_size={self.max_queue_size}, "
             f"log_level={self.log_level}, "
             f"enable_metrics={self.enable_metrics}, "
             f"metrics_port={self.metrics_port}, "

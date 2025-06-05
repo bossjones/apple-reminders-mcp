@@ -1,0 +1,80 @@
+{
+  "defineConstant": {
+    "DEBUG": true
+  },
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/.pytest_cache",
+    "**/.ruff_cache",
+    "**/.mypy_cache",
+    ".venv",
+    "site",
+    "build",
+    "dist"
+  ],
+  "executionEnvironments": [
+    {
+      "extraPaths": [
+        "packages/cursor_rules_mcp_server/src"
+      ],
+      "pythonVersion": "3.12",
+      "root": "packages/cursor_rules_mcp_server"
+    },
+    {
+      "extraPaths": [
+        "packages/cursor_rules_mcp_server/src"
+      ],
+      "pythonVersion": "3.12",
+      "reportPrivateUsage": false,
+      "root": "packages/cursor_rules_mcp_server/src/cursor_rules_mcp_server/tests"
+    },
+    {
+      "extraPaths": [
+        "src"
+      ],
+      "pythonVersion": "3.12",
+      "root": "src/boss_bot"
+    },
+    {
+      "extraPaths": [
+        "src"
+      ],
+      "pythonVersion": "3.12",
+      "root": "scripts"
+    },
+    {
+      "root": "src"
+    }
+  ],
+  "failOnWarnings": true,
+  "ignore": [
+    "src/oldstuff"
+  ],
+  "include": [
+    "src",
+    "packages",
+    "scripts"
+  ],
+  "pythonPlatform": "Darwin",
+  "pythonVersion": "3.12",
+  "reportAny": "warning",
+  "reportArgumentType": "none",
+  "reportCallIssue": "none",
+  "reportExplicitAny": "warning",
+  "reportImplicitAbstractClass": "warning",
+  "reportImplicitRelativeImport": "warning",
+  "reportInvalidCast": "error",
+  "reportMissingImports": "error",
+  "reportMissingTypeStubs": false,
+  "reportOptionalMemberAccess": "none",
+  "reportOptionalOperand": "none",
+  "reportPrivateImportUsage": "none",
+  "reportPrivateLocalImportUsage": "warning",
+  "reportPrivateUsage": "none",
+  "reportUnannotatedClassAttribute": "error",
+  "reportUnreachable": "warning",
+  "reportUnusedParameter": "warning",
+  "strictGenericNarrowing": true,
+  "stubPath": "stubs"
+}

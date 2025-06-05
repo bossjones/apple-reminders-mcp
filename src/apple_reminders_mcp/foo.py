@@ -9,7 +9,6 @@ def foo(bar: str) -> str:
     Returns:
         Description of return value
     """
-
     return bar
 
 

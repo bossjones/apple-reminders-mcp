@@ -1,0 +1,144 @@
+---
+- name: IPython debug leftover
+  pattern: IPython\.embed()
+  filePattern: .*\.py$
+  hint: Remove IPython.embed() debugging statements before committing
+  error: true
+
+# Cursor Rules Linting Rules
+
+- name: Cursor rule file in wrong location
+  pattern: "^---\n(?:.*\n)+?---"
+  filePattern: .*\.(mdc|mdc\.md)$
+  hint: "Cursor rule files (.mdc) must be placed in the .cursor/rules/ directory"
+  error: true
+  exclude: \.cursor/rules/.*\.mdc$|\.relint\.yml$
+
+- name: Cursor rule with wrong extension
+  pattern: "^---\n(?:.*\n)+?---"
+  filePattern: .*\.mdc\.md$
+  hint: "Cursor rule files should use .mdc extension, not .mdc.md"
+  error: true
+  exclude: \.relint\.yml$
+
+- name: Missing alwaysApply in frontmatter
+  pattern: "^---\n(?!(?:.*\n)*?alwaysApply:(?:.*\n)+?---)(?:.*\n)+?---"
+  filePattern: .*\.(mdc|mdc\.md)$
+  hint: "Cursor rule files must include 'alwaysApply: true' or 'alwaysApply: false' in frontmatter"
+  error: true
+  exclude: \.relint\.yml$
+
+- name: Quoted glob patterns in frontmatter
+  pattern: "^---\n(?:(?!---).)*?globs:(?:.*?[\"'].*?[\"'].*?\n)(?:(?!---).)*?---"
+  filePattern: .*\.(mdc|mdc\.md)$
+  hint: |
+    Glob patterns in cursor rules should be unquoted:
+    Use `globs: *.py` instead of `globs: "*.py"`
+  error: true
+  exclude: \.relint\.yml$
+
+- name: Array notation for globs in frontmatter
+  pattern: "^---\n(?:(?!---).)*?globs:\\s*\\[(?:(?!---).)*?---"
+  filePattern: .*\.(mdc|mdc\.md)$
+  hint: |
+    Glob patterns in cursor rules should use comma-separated values, not array notation:
+    Use `globs: *.py, *.md` instead of `globs: ["*.py", "*.md"]`
+  error: true
+  exclude: \.relint\.yml$
+
+- name: Missing spaces after commas in globs
+  pattern: "^---\n(?:(?!---).)*?globs:.*?,\\S(?:(?!---).)*?---"
+  filePattern: .*\.(mdc|mdc\.md)$
+  hint: |
+    Glob patterns in cursor rules should have spaces after commas:
+    Use `globs: *.py, *.md` instead of `globs: *.py,*.md`
+  error: true
+  exclude: \.relint\.yml$
+
+- name: Curly brace notation in globs
+  pattern: "^---\n(?:(?!---).)*?globs:.*?\\{.*?\\}(?:(?!---).)*?---"
+  filePattern: .*\.(mdc|mdc\.md)$
+  hint: |
+    Glob patterns in cursor rules should use comma-separated values, not curly brace notation:
+    Use `globs: *.py, *.js, *.ts` instead of `globs: *.{py,js,ts}`
+  error: true
+  exclude: \.relint\.yml$
+
+- name: Missing rule tag
+  pattern: "^---\n(?:.*\n)+?---\n(?:(?!<rule>).)*$"
+  filePattern: .*\.(mdc|mdc\.md)$
+  hint: "Cursor rule files must include a <rule> tag"
+  error: true
+  exclude: \.relint\.yml$
+
+- name: Missing rule name after tag
+  # Match <rule> tag not followed by name: within 5 lines
+  pattern: "<rule>(?:\n[^\n]*){0,5}(?!.*name:)"
+  filePattern: .*\.(mdc|mdc\.md)$
+  hint: "Cursor rule must include a name field immediately after the <rule> tag"
+  error: true
+  exclude: \.relint\.yml$
+
+# TIL Post Validation Rules
+
+- name: Invalid TIL post category
+  pattern: "^---\n(?:(?!---).)*?categories:\n(?:(?!---).)*?- ((?!tutorial|guide|documentation|case-study|best-practice|reference|example|how-to|web-development|api-design|architecture|testing-and-quality|security|data-engineering|devops|version-control|ai-foundations|llm-engineering|ai-agent-workflows|ai-ethics|ai-tools|development|development-practices|frontend-development|backend-development|career-and-community)[a-zA-Z0-9-]+)"
+  filePattern: docs/til/posts/.*\.md$
+  hint: |
+    TIL post contains an invalid category.
+    Please use only categories from the allowed list in mkdocs.yml:
+    - tutorial, guide, documentation, case-study, best-practice, reference, example, how-to
+    - web-development, api-design, architecture, testing-and-quality, security
+    - data-engineering, devops, version-control
+    - ai-foundations, llm-engineering, ai-agent-workflows, ai-ethics, ai-tools
+    - development, development-practices, frontend-development, backend-development, career-and-community
+  error: true
+
+- name: Invalid TIL post tag
+  pattern: "^---\n(?:(?!---).)*?tags:\n(?:(?!---).)*?- ((?!python|javascript|typescript|css|html|yaml|json|markdown|sql|bash|rust|go|react|vue|angular|django|flask|fastapi|express|next-js|svelte|tailwind|git|docker|kubernetes|mkdocs|github-actions|pytest|jest|webpack|vite|jupyter|postgresql|mysql|sqlite|mongodb|redis|duckdb|aws|azure|gcp|netlify|vercel|heroku|fly-io|openai|langchain|anthropic|mistral|llama|stable-diffusion|cursor|agentic-workflows|llm-rules|prompt-engineering-advanced|ai-agent-workflows|ai-ethics|ai-tools|ai-foundations|llm-engineering)[a-zA-Z0-9-]+)"
+  filePattern: docs/til/posts/.*\.md$
+  hint: |
+    TIL post contains an invalid tag.
+    Please use only tags from the allowed list in mkdocs.yml.
+    See the tags_allowed section in mkdocs.yml for the complete list.
+  error: true
+
+- name: Using prompt-engineering tag instead of prompt-engineering-advanced
+  pattern: "^---\n(?:(?!---).)*?tags:\n(?:(?!---).)*?- prompt-engineering(?!-advanced)"
+  filePattern: docs/til/posts/.*\.md$
+  hint: |
+    Use 'prompt-engineering-advanced' tag instead of 'prompt-engineering'.
+    The tag 'prompt-engineering' is not in the allowed list in mkdocs.yml.
+  error: true
+
+- name: Documentation as tag instead of category
+  pattern: "^---\n(?:(?!---).)*?tags:\n(?:(?!---).)*?- documentation"
+  filePattern: docs/til/posts/.*\.md$
+  hint: |
+    'documentation' should be used as a category, not a tag.
+    Please remove it from tags and add it to categories if not already there.
+  error: true
+
+- name: Missing required TIL post frontmatter
+  pattern: "^---\n(?!(?:.*\n)*?date:(?:.*\n)+?---)(?:.*\n)+?---"
+  filePattern: docs/til/posts/.*\.md$
+  hint: "TIL posts must include a date field in frontmatter"
+  error: true
+
+- name: Missing categories in TIL post frontmatter
+  pattern: "^---\n(?!(?:.*\n)*?categories:(?:.*\n)+?---)(?:.*\n)+?---"
+  filePattern: docs/til/posts/.*\.md$
+  hint: "TIL posts must include at least one category in frontmatter"
+  error: true
+
+- name: Missing tags in TIL post frontmatter
+  pattern: "^---\n(?!(?:.*\n)*?tags:(?:.*\n)+?---)(?:.*\n)+?---"
+  filePattern: docs/til/posts/.*\.md$
+  hint: "TIL posts must include at least one tag in frontmatter"
+  error: true
+
+- name: Missing slug in TIL post frontmatter
+  pattern: "^---\n(?!(?:.*\n)*?slug:(?:.*\n)+?---)(?:.*\n)+?---"
+  filePattern: docs/til/posts/.*\.md$
+  hint: "TIL posts must include a slug field in frontmatter for proper URL generation"
+  error: true

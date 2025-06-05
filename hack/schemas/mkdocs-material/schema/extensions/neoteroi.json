@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "title": "Neoteroi Markdown Extensions",
+  "markdownDescription": "https://github.com/Neoteroi/mkdocs-plugins",
+  "oneOf": [
+    {
+      "title": "Cards \u2013 Neoteroi Extensions",
+      "markdownDescription": "https://github.com/Neoteroi/mkdocs-plugins#cards",
+      "enum": [
+        "neoteroi.cards"
+      ]
+    },
+    {
+      "title": "Timeline \u2013 Neoteroi Extensions",
+      "markdownDescription": "https://github.com/Neoteroi/mkdocs-plugins#timeline",
+      "enum": [
+        "neoteroi.timeline"
+      ]
+    },
+    {
+      "title": "Projects \u2013 Neoteroi Extensions",
+      "markdownDescription": "https://github.com/Neoteroi/mkdocs-plugins#projects",
+      "enum": [
+        "neoteroi.projects"
+      ]
+    },
+    {
+      "title": "Span Table \u2013 Neoteroi Extensions",
+      "markdownDescription": "https://github.com/Neoteroi/mkdocs-plugins#spantable",
+      "enum": [
+        "neoteroi.spantable"
+      ]
+    }
+  ]
+}

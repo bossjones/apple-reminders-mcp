@@ -1,16 +1,285 @@
+---
+# Global exclude pattern - Skip running hooks on alembic migration files
+exclude: ^boss_bot/alembic/.*
+# To use:
+#
+#     pre-commit run -a
+#
+# Or:
+#
+#     pre-commit install  # (runs every time you commit in git)
+#
+# To update this file:
+#
+#     pre-commit autoupdate
+#
+# See https://github.com/pre-commit/pre-commit
+ci:
+  # Message used when pre-commit auto-fixes issues
+  autofix_commit_msg: "style: pre-commit fixes"
+  # Whether to auto-fix PRs
+  autofix_prs: true
+  # Branch to update when auto-updating hooks
+  autoupdate_branch: ""
+  # Message used when auto-updating hooks
+  autoupdate_commit_msg: "chore: update pre-commit hooks"
+  # How often to auto-update hooks
+  autoupdate_schedule: weekly
+  # List of hooks to skip in CI
+  skip: []
+  # Whether to process git submodules
+  submodules: false
+default_install_hook_types:
+  # Runs before commit is finalized, checks staged changes
+  - pre-commit
+  # Validates commit messages
+  - commit-msg
+  # Runs before push operation
+  - pre-push
+  # Runs after checkout operation
+  - post-checkout
+  # Runs after merge operation
+  - post-merge
+default_stages:
+  # Run during git commit
+  - pre-commit
+  # Run during git push
+  - pre-push
+  # Run during git merge
+  - pre-merge-commit
+  # Run during git rebase
+  - pre-rebase
+# TODO: Work with team to see when the right time is to enable this
 repos:
+
+
+  # Validates pyproject.toml file structure
+  - repo: https://github.com/abravalheri/validate-pyproject
+    rev: v0.24.1
+    hooks:
+      - id: validate-pyproject
+        # Optional extra validations from SchemaStore:
+        additional_dependencies:
+          ["validate-pyproject[all]", "validate-pyproject-schema-store"]
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.26.0
+    hooks:
+      - id: gitleaks
+
+  # Text-related hooks for various formatting tasks
+  - repo: https://github.com/sirosen/texthooks
+    rev: 0.6.8
+    hooks:
+      - id: alphabetize-codeowners
+      - id: fix-smartquotes
+      - id: fix-ligatures
+
+
+  - repo: https://github.com/bossjones/pre-commit-pretty-format-json5
+    rev: "86957f50581644a8dd62833bcecbac1bd2c0e135"
+    hooks:
+      - id: pretty-format-json5
+        files: \.vscode/settings\.json$
+
+  # Standard pre-commit hooks for basic file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      # Verifies Python syntax
+      - id: check-ast
+        exclude: (.vscode|contrib)
+      # Verifies JSON syntax
+      - id: check-json
+        exclude: (.vscode|.devcontainer|hack|cookbook|ai_docs)
+      - id: detect-private-key # checks for private keys (BEGIN X PRIVATE KEY, etc.)
+      - id: pretty-format-json # cleaner json files
+        args: ["--autofix"] # automatically
+        files: ^pyrightconfig\.json$
+
+  # Python import sorting for aio_settings.py
+  - repo: https://github.com/bwhmather/ssort
+    rev: 0.14.0
+    hooks:
+      - id: ssort
+        files: ^.*increase_version_number\.py$
+
+  # When running with --fix, Ruff's lint hook should be placed before Ruff's formatter hook, and before Black, isort, and other formatting tools, as Ruff's fix behavior can output code changes that require reformatting.
+  # SOURCE: https://github.com/astral-sh/ruff-pre-commit
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.11
+    hooks:
+      # Ruff linter
+      - id: ruff
+        # entry: ruff check --force-exclude
+        args:
+          - --fix
+          - --exit-non-zero-on-fix
+          - --show-fixes
+          - --config=pyproject.toml
+        # SOURCE: https://github.com/girder/large_image/blob/2e6fd90cfb9179f2c0bd59031f45805018f3f04a/.pre-commit-config.yaml
+        types_or:
+          - python
+        exclude: ^(justfiles|typings)/.*
+
+      # Ruff formatter
+      - id: ruff-format
+        # entry: ruff format --force-exclude
+        types_or:
+          - python
+        args:
+          - --config=pyproject.toml
+        files: ^((src|tests|notebooks)/.+)?[^/]+\.(py|ipynb)$
+        exclude: (justfiles|hack)
+
+  # Additional pre-commit hooks for file integrity checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      # Check for case conflicts in filenames
+      - id: check-case-conflict
+      # Check for merge conflict markers
+      - id: check-merge-conflict
+      # Check for broken symlinks
+      - id: check-symlinks
+      # Ensure files end with a newline
+      - id: end-of-file-fixer
+        exclude: (.*\.pyi$)
+      # Check for mixed line endings
+      - id: mixed-line-ending
+        exclude: (.*\.pyi$)
+      # Remove trailing whitespace
+      - id: trailing-whitespace
+        exclude: (.*\.pyi$)
+  ##########################################################################################
+  # #  # NOTE: if we are going to use this, it needs to run AFTER ruff.
+  ##########################################################################################
+
+
+  - repo: https://github.com/pre-commit/pygrep-hooks
+    rev: v1.10.0
+    hooks:
+      # Prevent use of deprecated logging.warn
+      - id: python-no-log-warn
+      # Check for Unicode replacement characters
+      - id: text-unicode-replacement-char
+
+  # Local hooks that run commands directly on the system
+  - repo: local
+    hooks:
+      # Custom hook to detect pytest live logging configuration
+      - id: detect-pytest-live-log
+        name: detect-pytest-live-log
+        entry: bash -x ./detect_pytest_live_logging.sh
+        language: system
+        types:
+          - toml
+        files: ^pyproject.*$
+
+  # Python docstring formatting
+  - repo: https://github.com/DanielNoord/pydocstringformatter
+    rev: v0.7.3
+    hooks:
+      - id: pydocstringformatter
+        args:
+          - --style {numpydoc,pep257}
+          - --no-strip-whitespace
+          - --no-capitalize-first-letter
+        files: ^((src|tests|notebooks)/.+)?[^/]+\.(py|ipynb)$
+        exclude: (justfiles|hack)
+
+  # Automatically upgrade Python syntax
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.20.0
+    hooks:
+      - id: pyupgrade
+        args:
+          - --py310-plus
+          - --keep-runtime-typing
+
+
+  # JSON Schema validation for GitHub workflows
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.33.0
+    hooks:
+      # Validate GitHub workflow files
+      - id: check-github-workflows
+        exclude: (justfiles|hack|.github/workflows/_python-vulnerability-scan.yml)
+      # Validate ReadTheDocs configuration
+      - id: check-readthedocs
+
+  # SOURCE: https://github.com/kiwicom/pytest-recording/tree/master
+  - repo: https://github.com/codingjoe/relint
+    rev: 3.3.1
+    hooks:
+      - id: relint
+        args:
+          - --config=.relint.yml
+          - --diff
+
+  # Commitizen for standardizing commit messages
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: "v4.8.2"
+    hooks:
+      # Check commit message format
+      - id: commitizen
+      # Check branch naming convention
+      - id: commitizen-branch
+        stages: [pre-push]
+
+
+  - repo: https://github.com/ComPWA/taplo-pre-commit
+    rev: v0.9.3
+    hooks:
+      - id: taplo-format
+        entry: taplo fmt
+        args:
+          - --config=taplo.toml
+          - --diff
+      - id: taplo-lint
+        entry: taplo lint
+        args:
+          - --config=taplo.toml
+          - --default-schema-catalogs
+          - --schema=taplo://taplo.toml
+        files: taplo.toml
+      # DISABLED: because it's not working (the url redirects to a 404)
+      # - id: taplo-lint
+      #   entry: taplo lint
+      #   args:
+      #     - --config=taplo.toml
+      #     - --default-schema-catalogs
+      #     - --schema=https://json.schemastore.org/pyproject.json
+      #   files: pyproject.toml
+
+  # Additional pyproject.toml validation
+  - repo: https://github.com/abravalheri/validate-pyproject
+    rev: v0.24.1
+    hooks:
+      - id: validate-pyproject
+        # Optional extra validations from SchemaStore:
+        additional_dependencies:
+          ["validate-pyproject[all]", "validate-pyproject-schema-store"]
+
+  - repo: https://github.com/tcort/markdown-link-check
+    rev: v3.13.7
+    hooks:
+      - id: markdown-link-check
+        args: [--quiet]
+
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: "v5.0.0"
     hooks:
       - id: check-case-conflict
       - id: check-merge-conflict
-      - id: check-toml
-      - id: check-yaml
-      - id: check-json
-        exclude: ^.devcontainer/devcontainer.json
-      - id: pretty-format-json
-        exclude: ^.devcontainer/devcontainer.json
-        args: [--autofix, --no-sort-keys]
+      # - id: check-toml
+      # - id: check-yaml
+      # - id: check-json
+      #   exclude: ^.devcontainer/devcontainer.json
+      # - id: pretty-format-json
+      #   exclude: ^.devcontainer/devcontainer.json
+      #   args: [--autofix, --no-sort-keys]
       - id: end-of-file-fixer
       - id: trailing-whitespace
 

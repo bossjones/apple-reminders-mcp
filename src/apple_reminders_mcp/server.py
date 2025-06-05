@@ -1,19 +1,12 @@
 # NOTE: borrowed this from https://github.com/shreyanshjain05/apple_reminder_mcp_server/blob/main/server.py
-import asyncio
 import datetime
 import json
-import os
 import subprocess
 from typing import Optional
 
-from dotenv import load_dotenv
 from mcp.server.fastmcp import FastMCP
 
-load_dotenv()
-HOST = os.getenv("HOST")
-PORT = os.getenv("PORT")
-
-mcp = FastMCP("mcp-apple-reminders", description="MCP server for managing Apple Reminder", host=HOST, port=PORT)
+mcp = FastMCP("mcp-apple-reminders", description="MCP server for managing Apple Reminder")
 
 
 def run_applescript(script: str) -> str:
@@ -306,28 +299,4 @@ end tell
 
 
 if __name__ == "__main__":
-    import asyncio
-
-    async def test_functions():
-        print("=== Creating a test reminder ===")
-        create_result = await create_reminder(
-            title="Test Reminder",
-            due_date=datetime.date(2026, 5, 30),
-            notes="This is a test note",
-            list_name="Reminders",
-        )
-        print(create_result)
-
-        print("\n=== Getting reminders from 'Reminders' list ===")
-        get_result = await get_reminder(list_name="Reminders")
-        print(get_result)
-
-        print("\n=== Listing all available reminder lists ===")
-        list_result = await list_reminder_lists()
-        print(list_result)
-
-        print("\n=== Deleting the test reminder ===")
-        delete_result = await delete_reminder(name="Test Reminder", list_name="Reminders")
-        print(delete_result)
-
-    asyncio.run(test_functions())
+    mcp.run()

@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(uv run:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "mcp__mcp-server-fastmcp__search_python_sdk_documentation",
+      "mcp__mcp-server-fastmcp__fetch_python_sdk_documentation",
+      "mcp__mcp-server-fastmcp__search_python_sdk_code",
+      "mcp__mcp-server-fastmcp__fetch_generic_url_content",
+      "Bash(python:*)",
+      "Bash(timeout:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }

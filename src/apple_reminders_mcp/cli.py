@@ -9,7 +9,7 @@
 from __future__ import annotations
 
 # main.py or boss-bot application entry point
-from apple_reminders_mcp.logging import early_init
+from apple_reminders_mcp.logger_config import early_init
 
 # 🔥 STEP 1: Call early_init() FIRST - before ANY other imports
 early_init()
@@ -46,7 +46,7 @@ from apple_reminders_mcp.__version__ import __version__
 
 # 🔥 STEP 3: Configure full logging features after imports
 from apple_reminders_mcp.env import McpSettings
-from apple_reminders_mcp.logging import setup_apple_reminders_mcp_logging
+from apple_reminders_mcp.logger_config import setup_apple_reminders_mcp_logging
 from apple_reminders_mcp.utils.asynctyper import AsyncTyper
 
 # Initialize boss-bot settings
@@ -148,10 +148,19 @@ def logtree() -> None:
 
 @APP.command()
 def go() -> None:
-    """Main entry point for Apple Reminders MCP"""
-    typer.echo("Starting up Apple Reminders MCP Server")
-    # TODO: Implement server startup logic
-    cprint("[yellow]Server startup not yet implemented[/yellow]")
+    """Main entry point for Apple Reminders MCP in stdio mode"""
+    cprint("[bold blue]🚀 Starting Apple Reminders MCP Server in stdio mode[/bold blue]")
+    try:
+        # Import and run the server in stdio mode
+        from apple_reminders_mcp.server import mcp
+
+        mcp.run()
+    except KeyboardInterrupt:
+        cprint("[yellow]⏹️  Server stopped by user[/yellow]")
+    except Exception as e:
+        cprint(f"[red]❌ Error starting server: {e}[/red]")
+        LOGGER.error(f"Server startup error: {e}")
+        raise typer.Exit(1)
 
 
 @APP.command("serve-mcp")

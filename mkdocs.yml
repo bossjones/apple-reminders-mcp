@@ -1,0 +1,52 @@
+site_name: apple-reminders-mcp
+repo_url: https://github.com/bossjones/apple-reminders-mcp
+site_url: https://bossjones.github.io/apple-reminders-mcp
+site_description: A Model Context Protocol (MCP) server that provides programmatic access to Apple Reminders.
+site_author: Malcolm Jones
+edit_uri: edit/main/docs/
+repo_name: bossjones/apple-reminders-mcp
+copyright: Maintained by <a href="https://bossjones.com">bossjones</a>.
+
+nav:
+  - Home: index.md
+  - Modules: modules.md
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: ["src/apple_reminders_mcp"]
+theme:
+  name: material
+  feature:
+    tabs: true
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/bossjones/apple-reminders-mcp
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/apple-reminders-mcp
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
